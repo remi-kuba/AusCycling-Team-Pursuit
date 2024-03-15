@@ -5,6 +5,8 @@ import itertools
 from enum import Enum
 import pandas as pd
 from scipy import interpolate
+import math
+import numpy
 
 
 class Position(Enum):
@@ -15,7 +17,7 @@ class Position(Enum):
 
 
 class RiderData:
-    def __init__(self, drags, areas, curves):
+    def __init__(self, drags, areas, curves, ):
         self.power_percent = {0: 0.95,
                               1: 0.7,
                               2: 0.65,
@@ -23,7 +25,7 @@ class RiderData:
         self.air_density = 1.225
 
         # TODO: fix the velocity and time_125 setting
-        self.velocity = 10
+        self.velocity = 1
         self.time_125 = 12.5
 
         self.drags = drags
@@ -76,6 +78,12 @@ class RiderData:
             new_w_primes[rider] = w_primes[rider] - work_depleted
         return new_w_primes
 
+    def make_copy(self):
+        new_drags = [i for i in self.drags]
+        new_areas = [i for i in self.areas]
+        new_curves = [i for i in self.curves]
+        return RiderData(new_drags, new_areas, new_curves)
+
 
 def all_orderings(num_riders):
     """
@@ -127,25 +135,28 @@ def minimize_time(riders, w_primes, switches=None):
     if not riders.distance:
         return riders.time, switches
 
-    # print("here")
     riders.distance -= 125
     riders.time += riders.time_125
     new_w_primes = riders.update_w_primes(w_primes)
-    # new_w_primes = [w - get_work_depletion(i, i, velocity, curves, time_over_125, drags, areas)
-    #                 for i, w in enumerate(w_primes)]
 
     riders.new_leader()
     switch_now = minimize_time(riders, new_w_primes, switches)
     riders.old_leader()
     no_switch = minimize_time(riders, new_w_primes, switches)
 
+    time = no_switch[0]
+    rest_of_switches = no_switch[1]
     if switch_now[0] < no_switch[0]:
         switches.append(riders.get_switch_number())
+        rest_of_switches = switch_now[1]
+        time = switch_now[0]
 
-    riders.distance += 125
-    riders.time -= riders.time_125
+    switches.extend(rest_of_switches)
+    #
+    # riders.distance += 125
+    # riders.time -= riders.time_125
 
-    return min([switch_now, no_switch], key=lambda t: t[0]), switches
+    return time + riders.time, switches
 
 
 def main():
@@ -153,33 +164,36 @@ def main():
     # in m^2
     areas = [0.36, 0.35, 0.355, 0.372, 0.355, 0.352]
     # in Joules
-    ws = [5000, 5200, 5000, 5100, 5080, 5010]
+    ws = [50000, 52000, 50000, 51000, 50080, 50100]
 
-    df = pd.read_csv('../dummy_data.csv')
+    df = pd.read_csv('../power_curves.csv')
     print(df.keys())
-    x = df['Time'].to_numpy()
-    y = df['Power'].to_numpy()
+    x = df['Time (s)'].to_numpy()
+    y = df['W4'].to_numpy()
+    # y = numpy.array([math.log(a) for a in y])
+    # y = pd.DataFrame.apply(y, lambda a: math.log(a))
 
     i = interpolate.InterpolatedUnivariateSpline(x, y)
 
     time, power = [], []
 
-    print(find_optimal_ordering(6, drags, areas, ws, [i]*6))
+    # print(find_optimal_ordering(6, drags, areas, ws, [i]*6))
 
-    with open('../dummy_data.csv', 'r') as File:
+    with open('../power_curves.csv', 'r') as File:
         plots = csv.reader(File, delimiter=',')
         next(plots)
         for row in plots:
             time.append(float(row[0]))
-            power.append(float(row[1]))
-    for j in range(0, 1200, 5):
+            power.append(float(row[8]))
+    for j in range(0, 3500, 1):
         time.append(j)
         power.append(i(j))
-    # plt.scatter(time, power, color='g', s=100)
-    # plt.xlabel('Time')
-    # plt.ylabel('Power')
-    # plt.title('Power Curve')
-    # plt.show()
+    plt.scatter(time, power, color='g', s=20)
+    plt.xlabel('Time')
+    plt.ylabel('Power')
+    plt.title('Power Curve')
+    plt.show()
+    # print(i(3500))
 
 
 if __name__ == "__main__":
