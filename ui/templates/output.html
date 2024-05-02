@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV File Upload Output</title>
+</head>
+<body>
+    <h1>CSV File Content</h1>
+    <h2>File 1</h2>
+    <table border="1">
+        <tr>
+            {% for column in data1 %}
+            <td>{{ column }}</td>
+            {% endfor %}
+        </tr>
+    </table>
+    <h2>File 2</h2>
+    <table border="1">
+        <tr>
+            {% for column in data2 %}
+            <td>{{ column }}</td>
+            {% endfor %}
+        </tr>
+    </table>
+</body>
+</html>
