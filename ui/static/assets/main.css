@@ -12,19 +12,32 @@ tfoot, thead, tr, th, td, article, aside,
 canvas, details, embed, figure, figcaption,
 footer, header, hgroup, menu, nav, output, ruby,
 section, summary, time, mark, audio, video {
-	margin: 0;
-	padding: 0;
-	border: 0;
 	scroll-behavior: smooth;
 	font-size: 100%;
 	font: inherit;
-	vertical-align: baseline;}
+	vertical-align: baseline;
+}
 
 body {
 		background: #f0f4f4;
-		color: #5b5b5b;
-		font-size: 15pt;
-		line-height: 1.85em;
+		color: black;
+		font-size: 30pt;
+		/*line-height: 1.85em;*/
 		font-family: 'Source Sans Pro', sans-serif;
-		font-weight: 300;
+		font-weight: 600;
+		text-align: center;
 	}
+
+input {
+	border: 1px solid #ccc;
+	display: inline-block;
+	padding: 6px 12px;
+	cursor: pointer;
+	text-align: center;
+}
+
+
+table {
+	margin-left: auto;
+	margin-right: auto;
+}
