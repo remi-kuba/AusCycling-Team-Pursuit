@@ -32,13 +32,6 @@ def upload():
 
 
 def get_first_row(file):
-    # stream = io.StringIO(file.stream.read().decode("UTF8"), newline=None)
-    # csv_reader = csv.reader(stream, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-    # first_row = []
-    # for row in csv_reader:
-    #     first_row.extend(row)
-    # if first_row is None:
-    #     raise ValueError("The CSV file is empty")
     df = pd.read_excel(file)
     rows = df.iloc[::]
     df.to_csv("../AusCycling_CP.csv")

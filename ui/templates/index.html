@@ -7,11 +7,17 @@
     <link href="{{ url_for('static',filename='assets/main.css') }}" rel="stylesheet"/>
 </head>
 <body>
-    <h1>Upload CSV Files</h1>
+    <h1>Upload Excel Files</h1>
     <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+        <h5>Physiology Data: </h5>
         <input type="file" name="file1"><br>
+        <h5>Power Curves: </h5>
         <input type="file" name="file2"><br>
         <input type="submit" value="Upload">
     </form>
+    <div class="logo-bottom">
+        <br/>
+        <img src="{{ url_for('static', filename='images/auscyclinglogo.png') }}" alt="Logo">
+    </div>
 </body>
 </html>
