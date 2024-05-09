@@ -1,28 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSV File Upload Output</title>
-    <link href="{{ url_for('static',filename='assets/main.css') }}" rel="stylesheet"/>
-</head>
-<body>
-    <h1>File Content</h1>
-    <h2>File 1</h2>
-    <table border="1">
-        <tr>
-            {% for column in data1 %}
-            <td>{{ column }}</td>
-            {% endfor %}
-        </tr>
-    </table>
-    <h2>File 2</h2>
-    <table border="1">
-        <tr>
-            {% for column in data2 %}
-            <td>{{ column }}</td>
-            {% endfor %}
-        </tr>
-    </table>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Results</title>
+        <link href="{{ url_for('static',filename='assets/main.css') }}" rel="stylesheet"/>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+            google.charts.load("current", {packages:["timeline"]});
+            google.charts.load("current", {packages:["corechart"]});
+            google.charts.setOnLoadCallback(drawSwitchChart);
+            google.charts.setOnLoadCallback(drawWorkChart);
+            function drawSwitchChart() {
+                const container = document.getElementById('switch_chart');
+                const graph = new google.visualization.Timeline(container);
+                const dataTable = new google.visualization.DataTable();
+                dataTable.addColumn({ type: 'string', id: 'Position' });
+                dataTable.addColumn({ type: 'string', id: 'Name' });
+                dataTable.addColumn({ type: 'date', id: 'Start' });
+                dataTable.addColumn({ type: 'date', id: 'End' });
+                dataTable.addRows([
+                  [ 'A', '2.25', new Date(0, 1, 1), new Date(1, 1, 1) ],
+                  [ 'A', '2.5', new Date(9, 1, 1), new Date(13, 1, 1) ],
+                  [ 'A', '1', new Date(28, 1, 1), new Date(32, 1, 1) ],
+                  [ 'B', '2.5', new Date(1, 1, 1), new Date(5, 1, 1)],
+                  [ 'B', '5', new Date(13, 1, 1), new Date(18, 1, 1)],
+                  [ 'C', '2', new Date(5, 1, 1), new Date(7, 1, 1)],
+                  [ 'C', '2', new Date(18, 1, 1), new Date(23, 1, 1)],
+                  [ 'D', '2', new Date(7, 1, 1), new Date(9, 1, 1)],
+                  [ 'D', '2', new Date(23, 1, 1), new Date(28, 1, 1)],
+                ]);
+
+                const options = {
+                    title: "Switches",
+                    width: 700,
+                    height: 400,
+                    backgroundColor: "#f0f4f4",
+                    // forceIFrame: true,
+                    legend: { position: "none" },
+                    fontName: "Source Sans Pro",
+                    timeline: { colorByRowLabel: true },
+                    colors: ['green', 'blue', 'yellow', 'red'],
+                };
+
+                graph.draw(dataTable, options);
+            }
+
+            function drawWorkChart() {
+                const riders = {{ riders|tojson }};
+                const workDepleted = {{ depletion|tojson }};
+                const remainingWork = {{ left|tojson }};
+                const percentWorkDepleted = {{ percent|tojson }};
+                const workData = [];
+                workData.push(["Rider", "Work Depleted", "Remaining Work", "Percent Work Depleted"]);
+                for (let i = 0; i < riders.length; i++) {
+                    workData.push([riders[i], workDepleted[i], remainingWork[i], percentWorkDepleted[i].toFixed(2) + "%"]);
+                }
+                var data = google.visualization.arrayToDataTable(workData);
+                var view = new google.visualization.DataView(data);
+                view.setColumns([0, 1, {
+                    calc: "stringify",
+                    sourceColumn: 3,
+                    type: "string",
+                    role: "annotation"}, 2]);
+
+                const options = {
+                    title: "Work Depletion",
+                    width: 400,
+                    height: 400,
+                    bar: {groupWidth: "95%"},
+                    isStacked: true,
+                    backgroundColor: "#f0f4f4",
+                    hAxis: {
+                        minValue: 0,
+                    },
+                    series: {
+                        0: {color: "#312f2f"},
+                        1: {color: "#A9A9A9"},
+                    },
+                    legend: { position: "none" },
+                    fontName: "Source Sans Pro",
+                };
+
+                const graph = new google.visualization.BarChart(document.getElementById("work_depleted_chart"));
+                graph.draw(view, options);
+            }
+        </script>
+    </head>
+    <body>
+        <table>
+            <tr>
+                <td>
+                    <div id="switch_chart"></div>
+                </td>
+                <td>
+                    <div id="work_depleted_chart"></div>
+                </td>
+            </tr>
+        </table>
+        <div class="logo-bottom">
+            <br/>
+            <img src="{{ url_for('static', filename='images/auscyclinglogo.png') }}" alt="Logo">
+        </div>
+    </body>
 </html>

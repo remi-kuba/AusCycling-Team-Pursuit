@@ -10,9 +10,9 @@
     <h1>Upload Excel Files</h1>
     <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
         <h5>Physiology Data: </h5>
-        <input type="file" name="file1"><br>
+        <input type="file" name="physiology"><br>
         <h5>Power Curves: </h5>
-        <input type="file" name="file2"><br>
+        <input type="file" name="power_curves"><br>
         <input type="submit" value="Upload">
     </form>
     <div class="logo-bottom">

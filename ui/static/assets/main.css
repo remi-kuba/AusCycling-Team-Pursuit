@@ -52,3 +52,15 @@ h5 {
 	width: 10%;
 	height: 10%;
 }
+
+#switch_chart {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#work_depleted_chart {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
