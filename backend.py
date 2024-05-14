@@ -27,22 +27,20 @@ def upload():
         overwrite_files(data1, data2)
 
         # Results returned by gurobi
-        # Assume results come in a dict of dicts:
-        #   {"switches": [_, _, _],
-        #    "starting order": ["m1", "m2", "m4", "m3"]
-        #    "riders": {"m1": [W', depleted, percentage], "m2": [...], ...}
-        #    "velocity": _,
-        #    "expected time": _,
-        #   }
-        results = run()
-        # results = {
-        #     "switches": [4.25, 6.25, 9.25, 11.35],
-        #     "riders": {"A": [1299, 800], "B": [2456, 2130], "C": [2139, 2090], "D": [2910, 2710]},
-        #     "starting order": ["A", "B", "C", "D"],
-        #     "velocity": 17.4,
-        #     "expected time": 245.2,
+        # {
+        #   'cyclist_order': ('x', 'x', 'x', 'x'),
+        #   'number_of_intervals': #,
+        #   'team_work_depletion': #.##,
+        #   'team_work_depletion_percentage': #.##,
+        #   'switch_strategy': {0: #.##,
+        #                       1: #.##, ...},
+        #   'cyclist_work_depletion': [#.##, #.##, #.##, #.##],
+        #   'cyclist_work_depletion_percent': [#.##, #.##, #.##, #.##],
+        #   'half_lap_time': #.#,
+        #   'velocity_km_per_hour': #.##,
+        #   'feasibility': 'feasible'/'infeasible'
         # }
-        # riders = list(results["riders"].keys())
+        results = run()
         riders = [r for r in results["cyclist_order"]]
         velocity = round(results["velocity_km_per_hour"], 2)
         velocity_m_s = results["velocity_km_per_hour"] / 3.6
@@ -51,7 +49,6 @@ def upload():
         acceleration_time = 1000/velocity_m_s  # Kinematic equation
         constant_time = 3500/velocity_m_s
         expected_time = round(acceleration_time + constant_time, 2)
-        # bends = [2.25, 2.75, 6.75, 10.75, 12.25, 15.25]
 
         num = 0
         bends = []
@@ -67,9 +64,6 @@ def upload():
         depletion = results["cyclist_work_depletion"]
         percent = results["cyclist_work_depletion_percent"]
         left = [d/p*100-d for d, p in zip(depletion, percent)]
-        # depletion = [results["riders"][rider][1] for rider in riders]
-        # left = [(results["riders"][rider][0] - results["riders"][rider][1]) for rider in riders]
-        # percent = [(results["riders"][rider][1] / results["riders"][rider][0] * 100) for rider in riders]
 
 
     except Exception as e:

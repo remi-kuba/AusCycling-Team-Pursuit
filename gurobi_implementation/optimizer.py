@@ -1,17 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[11]:
-
-
-# AusCycling Optimization Problem
-# Date: May 2, 2024
-
-
-# In[12]:
-
-
-# !pip install gurobipy
 import gurobipy as gp
 from gurobipy import GRB
 import numpy as np
@@ -19,9 +5,6 @@ from scipy.interpolate import interp1d
 from itertools import permutations
 import csv
 import os
-
-
-# In[23]:
 
 
 # Unchanging variables
