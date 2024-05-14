@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Results</title>
+        <link href="{{ url_for('static',filename='assets/main.css') }}" rel="stylesheet"/>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+            google.charts.load("current", {packages:["timeline"]});
+            google.charts.load("current", {packages:["corechart"]});
+            google.charts.setOnLoadCallback(drawSwitchChart);
+            google.charts.setOnLoadCallback(drawWorkChart);
+            function drawSwitchChart() {
+                const riders = {{ riders|tojson }};
+                const colors = ['#63cb6d', '#4987ff', '#ffe74b', '#ff4a4a'];
+                const switches = {{ switches|tojson }};
+                const switchData = [];
+                const switchHeaders = ["Rider"];
+                for (let i = 0; i < switches.length; i++) {
+                    switchHeaders.push(`Interval ${i}`);
+                    switchHeaders.push({ role: 'style'});
+                }
+                switchData.push(switchHeaders);
+                for (let i = 0; i < riders.length; i++) {
+                    const riderData = [riders[i]];
+                    for (let j = 0; j < switches.length; j++) {
+                        riderData.push(switches[j]);
+                        let color = "opacity: 0";
+                        if (j % 4 === i) {
+                            color = colors[i];
+                        }
+                        riderData.push(color);
+                    }
+                    switchData.push(riderData);
+                }
+                var data = google.visualization.arrayToDataTable(switchData);
+                var view = new google.visualization.DataView(data);
+                const column = []
+                for (let i = 0; i < switchHeaders.length; i++) {
+                    column.push(i);
+                    if (i > 0 && i % 2 === 1) {
+                        column.push({
+                           calc: function(dataTable, row) {
+                                const colorColumnIndex = i + 1; // Style column is right after the data column
+                                const color = dataTable.getValue(row, colorColumnIndex);
+                                if (color !== "opacity: 0") {
+                                    return dataTable.getValue(row, i).toString();
+                                }
+                                return null;
+                            },
+                           sourceColumn: i,
+                           type: "string",
+                           role: "annotation"
+                        });
+                    }
+                }
+
+                view.setColumns(column);
+
+                const options = {
+                    title: "Switch Strategy",
+                    titleTextStyle: {
+                        fontSize: 20,
+                        bold: true,
+                    },
+                    width: 900,
+                    height: 400,
+                    hAxis: {
+                        title: 'Bends',
+                        titleTextStyle: {
+                            fontSize: 17,
+                        },
+                        minValue: 0,
+                        textStyle : {
+                            fontSize: 16
+                        },
+                    },
+                    vAxis: {
+                        textStyle: {
+                            fontSize: 16
+                        }
+                    },
+                    bar: {groupWidth: "80%"},
+                    isStacked: true,
+                    backgroundColor: "#f0f4f4",
+                    legend: { position: "none" },
+                    fontName: "Source Sans Pro",
+                    chartArea: {
+                        width: '80%'
+                    },
+                    annotations: {
+                        textStyle: {
+                            fontSize: 20,
+                            alignment: 'center',
+                        },
+                        highContrast: true,
+                    },
+                    // tooltip: { trigger: 'none' },
+                    enableInteractivity: false
+                };
+
+                const graph = new google.visualization.BarChart(document.getElementById("other_chart"));
+                graph.draw(view, options);
+            }
+            function drawWorkChart() {
+                const riders = {{ riders|tojson }};
+                const workDepleted = {{ depletion|tojson }};
+                const remainingWork = {{ left|tojson }};
+                const percentWorkDepleted = {{ percent|tojson }};
+                const workData = [];
+                const colors = ['#63cb6d', '#4987ff', '#ffe74b', '#ff4a4a'];
+                workData.push([
+                    "Rider",
+                    "Work Depleted",
+                    { role: 'tooltip', type: 'string' },
+                    { role: 'style' },
+                    "Remaining Work",
+                    { role: 'tooltip', type: 'string' },
+                    "Percent Work Depleted"]);
+                for (let i = 0; i < riders.length; i++) {
+                    workData.push([
+                        riders[i],
+                        workDepleted[i],
+                        "Work Depleted: " + workDepleted[i].toFixed(2) + "J",
+                        colors[i],
+                        remainingWork[i],
+                        "Remaining Work: " + remainingWork[i].toFixed(2) + "J",
+                        percentWorkDepleted[i].toFixed(2) + "%"]);
+                }
+                var data = google.visualization.arrayToDataTable(workData);
+                var view = new google.visualization.DataView(data);
+                view.setColumns([
+                    0, // rider names
+                    1, // number for first block
+                    2, // hover result for first block
+                    {
+                        calc: "stringify",
+                        sourceColumn: 6,
+                        type: "string",
+                        role: "annotation"}, // result shown on block (percentage)
+                    3, // color of first block
+                    4, // number for second block
+                    5 // hover result for second block
+                ]);
+
+                const options = {
+                    title: "Work Depletion",
+                    titleTextStyle: {
+                        fontSize: 20,
+                        bold: true,
+                    },
+                    width: 400,
+                    height: 400,
+                    bar: {groupWidth: "80%"},
+                    isStacked: true,
+                    backgroundColor: "#f0f4f4",
+                    hAxis: {
+                        title: 'Work (J)',
+                        titleTextStyle: {
+                            fontSize: 17,
+                        },
+                        minValue: 0,
+                        textStyle : {
+                            fontSize: 16
+                        }
+                    },
+                    vAxis: {
+                        textStyle: {
+                            fontSize: 16
+                        }
+                    },
+                    series: {
+                        // 0: {color: "#312f2f"},
+                        1: {color: "#A9A9A9"},
+                    },
+                    legend: { position: "none" },
+                    fontName: "Source Sans Pro",
+                    chartArea: {
+                        width: '100%'
+                    },
+                    annotations: {
+                        textStyle: {
+                            fontSize: 20
+                        }
+                    }
+                };
+
+
+                const graph = new google.visualization.BarChart(document.getElementById("work_depleted_chart"));
+                graph.draw(view, options);
+            }
+        </script>
+    </head>
+    <body>
+        <h1>Results:</h1>
+        <table id="velocity">
+            <tr>
+                <td>
+                    Target Velocity: {{ velocity }} km/h<br>
+                    Expected Time: {{ expected_time }} s
+                </td>
+            </tr>
+        </table>
+        <br>
+        <table id="charts">
+            <tr>
+                <td>
+                    <div id="other_chart"></div>
+                </td>
+                <td>
+                    <div id="work_depleted_chart"></div>
+                </td>
+            </tr>
+        </table>
+        <div class="logo-bottom">
+            <br/>
+            <img src="{{ url_for('static', filename='images/auscyclinglogo.png') }}" alt="Logo">
+        </div>
+    </body>
+</html>

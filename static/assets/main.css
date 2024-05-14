@@ -42,7 +42,6 @@ table {
 	margin-right: auto;
 }
 
-
 h5 {
 	font-size: 15pt;
 	margin: 1em 0 0 0;
@@ -53,14 +52,15 @@ h5 {
 	height: 10%;
 }
 
-#switch_chart {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
 
 #work_depleted_chart {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+}
+
+#velocity td {
+	border: solid #08544c 3px;
+	padding: 0.5em;
+	font-size: 80%;
 }
