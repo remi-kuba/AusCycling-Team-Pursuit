@@ -158,6 +158,7 @@ def run():
         num_bends_steady_state = num_bends - num_half_laps_to_accel
         time_to_accel = (2 * 125 * num_half_laps_to_accel) / velocity_m_per_sec
         results_dictionary = {}
+        results_dictionary["num_half_laps_to_accel"] = num_half_laps_to_accel
 
         # Create the model object
         model= gp.Model ("AusCycling_Model")
@@ -252,9 +253,10 @@ def run():
     
     csv_file_path = os.path.join(absolute_path, "results.csv")
     init_num_intervals = 7
-    num_intervals_to_try = 5
-    half_lap_times = [6.65, 6.70, 6.75]
-    num_half_laps_to_accel = 4
+    num_intervals_to_try = 3
+    # half_lap_times = [6.65, 6.70, 6.75, 6.8, 6.85]
+    half_lap_times = [6.7, 6.8]
+    num_half_laps_to_accel = 3
     enforce_first_switch_lap = 4
 
     final_num_intervals = init_num_intervals + num_intervals_to_try

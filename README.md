@@ -26,4 +26,4 @@ Add or remove times to improve range/speed of optimizer
 ### Changing Interval Number:
 Similarly, edit the variables ```init_num_intervals``` and ```num_intervals_to_try``` to change the range of intervals tested. 
 
-The optimizer tests the intervals from __init_num_intervals__ to __init_num_intervals + num_intervals_to_try__.
+The optimizer tests the intervals from __init_num_intervals__ to __init_num_intervals + num_intervals_to_try - 1__.

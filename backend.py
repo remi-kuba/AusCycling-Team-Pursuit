@@ -38,16 +38,18 @@ def upload():
         #   'cyclist_work_depletion_percent': [#.##, #.##, #.##, #.##],
         #   'half_lap_time': #.#,
         #   'velocity_km_per_hour': #.##,
-        #   'feasibility': 'feasible'/'infeasible'
+        #   'feasibility': 'feasible'/'infeasible',
+        #   'num_half_laps_to_accel': #
         # }
         results = run()
         riders = [r for r in results["cyclist_order"]]
-        velocity = round(results["velocity_km_per_hour"], 2)
         velocity_m_s = results["velocity_km_per_hour"] / 3.6
+        half_lap_time = round(125/velocity_m_s, 2)
         # velocity = results["velocity"]
 
-        acceleration_time = 1000/velocity_m_s  # Kinematic equation
-        constant_time = 3500/velocity_m_s
+        acc_distance = results["num_half_laps_to_accel"] * 125
+        acceleration_time = acc_distance*2/velocity_m_s  # Kinematic equation
+        constant_time = (4000 - acc_distance)/velocity_m_s
         expected_time = round(acceleration_time + constant_time, 2)
 
         num = 0
@@ -69,8 +71,9 @@ def upload():
     except Exception as e:
         return str(e)
 
-    return render_template('output.html', velocity=velocity, expected_time=expected_time, riders=riders, depletion=depletion,
-                           left=left, percent=percent, switches=switches)
+    return render_template('output.html', velocity=round(velocity_m_s, 2), half_lap_time=half_lap_time,
+                           expected_time=expected_time, riders=riders, depletion=depletion, left=left, percent=percent,
+                           switches=switches)
 
 
 def overwrite_files(*args):
